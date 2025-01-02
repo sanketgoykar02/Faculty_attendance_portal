@@ -33,8 +33,15 @@ public class EmployeeController {
   @GetMapping("/me")
   public ResponseEntity<Employee> authenticatedUser() {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      Employee currentUser = (Employee) authentication.getPrincipal();
+//      Employee currentUser = (Employee) authentication.getPrincipal();
+//      return ResponseEntity.ok(currentUser);
+      Object principal = authentication.getPrincipal();
+      if (!(principal instanceof Employee)) {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+      }
+      Employee currentUser = (Employee) principal;
       return ResponseEntity.ok(currentUser);
+
   }
 
   @GetMapping("/")
@@ -45,7 +52,7 @@ public class EmployeeController {
 
   @PutMapping("/{id}")
   public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
-      return ResponseEntity.ok(employeeService.updateEmployee(id, employee));
+	  return ResponseEntity.ok(employeeService.updateEmployee(id, employee));
   }
 
   @DeleteMapping("/{id}")
