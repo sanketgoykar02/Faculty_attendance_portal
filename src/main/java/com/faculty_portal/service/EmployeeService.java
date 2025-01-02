@@ -44,7 +44,7 @@ public class EmployeeService {
             employee.setPhone(updatedEmployee.getPhone());
             employee.setVerificationCode(updatedEmployee.getVerificationCode());
             employee.setVerificationCodeExpiresAt(updatedEmployee.getVerificationCodeExpiresAt());
-            employee.setEnable(updatedEmployee.isEnable());
+            employee.setEnabled(updatedEmployee.isEnable());
             employee.setDepartment(updatedEmployee.getDepartment());
             employee.setAdmin(updatedEmployee.getAdmin());
 

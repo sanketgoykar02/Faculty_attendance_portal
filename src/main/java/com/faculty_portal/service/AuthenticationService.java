@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,7 +13,11 @@ import org.springframework.stereotype.Service;
 import com.faculty_portal.dto.LoginEmployeeDto;
 import com.faculty_portal.dto.RegisterEmployeeDto;
 import com.faculty_portal.dto.VerifyEmployeeDto;
+import com.faculty_portal.entity.Admin;
+import com.faculty_portal.entity.Department;
 import com.faculty_portal.entity.Employee;
+import com.faculty_portal.repository.AdminRepository;
+import com.faculty_portal.repository.DepartmentRepository;
 import com.faculty_portal.repository.EmployeeRepository;
 
 import jakarta.mail.MessagingException;
@@ -24,6 +29,12 @@ public class AuthenticationService {
 	private final AuthenticationManager authenticationManager;
 	private final EmailService emailService;
 
+	@Autowired
+	private AdminRepository adminRepository;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
+
 	public AuthenticationService(EmployeeRepository employeeRepository, AuthenticationManager authenticationManager,
 			PasswordEncoder passwordEncoder, EmailService emailService) {
 		this.authenticationManager = authenticationManager;
@@ -33,11 +44,20 @@ public class AuthenticationService {
 	}
 
 	public Employee signup(RegisterEmployeeDto input) {
-		Employee employee = new Employee(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
+		Employee employee = new Employee(input.getUsername(), input.getEmail(),
+				passwordEncoder.encode(input.getPassword()));
 		employee.setVerificationCode(generateVerificationCode());
 		employee.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-		employee.setEnable(false);
+		employee.setEnabled(false);
+
+		Admin admin = adminRepository.findById(1L) // Replace 1L with an existing Admin ID
+				.orElseThrow(() -> new RuntimeException("Admin not found"));
+		employee.setAdmin(admin);
 		sendVerificationEmail(employee);
+		
+		Department department = departmentRepository.findById(1L) // Replace 1L with an actual Department ID
+		        .orElseThrow(() -> new RuntimeException("Department not found"));
+		    employee.setDepartment(department);
 		return employeeRepository.save(employee);
 	}
 
@@ -62,7 +82,7 @@ public class AuthenticationService {
 				throw new RuntimeException("Verification code has expired");
 			}
 			if (employee.getVerificationCode().equals(input.getVerificationCode())) {
-				employee.setEnable(true);
+				employee.setEnabled(true);
 				employee.setVerificationCode(null);
 				employee.setVerificationCodeExpiresAt(null);
 				employeeRepository.save(employee);

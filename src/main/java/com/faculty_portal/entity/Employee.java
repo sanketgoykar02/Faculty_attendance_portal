@@ -36,7 +36,7 @@ public class Employee implements UserDetails {
 	private Department department;
 
 	@ManyToOne
-	@JoinColumn(name = "admin_id", nullable = false)
+	@JoinColumn(name = "admin_id", nullable = true)
 	private Admin admin;
 	
 	public Employee() {
@@ -125,7 +125,7 @@ public class Employee implements UserDetails {
 		return enabled;
 	}
 
-	public void setEnable(boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
