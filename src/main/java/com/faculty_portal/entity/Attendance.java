@@ -3,6 +3,8 @@ package com.faculty_portal.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +25,7 @@ public class Attendance {
 
 	@ManyToOne
 	@JoinColumn(name = "employee_id", nullable = false)
+	@JsonManagedReference
 	private Employee employee;
 
 	public Attendance() {

@@ -31,7 +31,7 @@ public class AuthenticationService {
 
 	@Autowired
 	private AdminRepository adminRepository;
-	
+
 	@Autowired
 	private DepartmentRepository departmentRepository;
 
@@ -43,37 +43,35 @@ public class AuthenticationService {
 		this.emailService = emailService;
 	}
 
-	public Employee signup(RegisterEmployeeDto input) {
-		Employee employee = new Employee(input.getUsername(), input.getEmail(),
-				passwordEncoder.encode(input.getPassword()));
-		employee.setVerificationCode(generateVerificationCode());
-		employee.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-		employee.setEnabled(false);
+	public Object signup(RegisterEmployeeDto input) {
+		if (employeeRepository.existsByEmail(input.getEmail())) {
+			Employee employee = employeeRepository.findByEmail(input.getEmail()).get();
+			Admin admin = adminRepository.findById(1L) // Replace 1L with an existing Admin ID
+					.orElseThrow(() -> new RuntimeException("Admin not found"));
+			employee.setAdmin(admin);
+			employee.setVerificationCode(generateVerificationCode());
+			employee.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(5));
+			sendVerificationEmail(employee);
 
-		Admin admin = adminRepository.findById(1L) // Replace 1L with an existing Admin ID
-				.orElseThrow(() -> new RuntimeException("Admin not found"));
-		employee.setAdmin(admin);
-		sendVerificationEmail(employee);
-		
-		Department department = departmentRepository.findById(1L) // Replace 1L with an actual Department ID
-		        .orElseThrow(() -> new RuntimeException("Department not found"));
-		    employee.setDepartment(department);
-		return employeeRepository.save(employee);
+			Department department = departmentRepository.findById(1L) // Replace 1L with an actual Department ID
+					.orElseThrow(() -> new RuntimeException("Department not found"));
+			employee.setDepartment(department);
+			return employeeRepository.save(employee);
+		} else {
+			return "Email Not Exists!!! Please Try again!!";
+		}
 	}
 
 	public Employee authenticate(LoginEmployeeDto input) {
 		Employee employee = employeeRepository.findByEmail(input.getEmail())
 				.orElseThrow(() -> new RuntimeException("User not found"));
-
 		if (!employee.isEnabled()) {
 			throw new RuntimeException("Account not verified. Please verify your account.");
 		}
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
-
 		return employee;
 	}
-
 	public void verifyEmployee(VerifyEmployeeDto input) {
 		Optional<Employee> optionalEmployee = employeeRepository.findByEmail(input.getEmail());
 		if (optionalEmployee.isPresent()) {
@@ -101,8 +99,6 @@ public class AuthenticationService {
 			if (employee.isEnabled()) {
 				throw new RuntimeException("Account is already verified");
 			}
-			employee.setVerificationCode(generateVerificationCode());
-			employee.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
 			sendVerificationEmail(employee);
 			employeeRepository.save(employee);
 		} else {

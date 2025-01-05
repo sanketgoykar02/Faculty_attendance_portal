@@ -20,10 +20,25 @@ public class EmployeeService {
     private PasswordEncoder passwordEncoder;
 
     // Save an employee
-    public Employee saveEmployee(Employee employee) {
+    public Employee saveEmployee(Employee employee) throws Exception {
         // Encode the password before saving
+    	if(!employeeRepository.existsById(employee.getId())) {
+    	if(employee.getAdmin()==null) {
+    		throw new Exception("Admin null");
+    	}else {
+    		employee.setAdmin(employee.getAdmin());
+    	}
+    	
+    	if(employee.getDepartment()==null) {
+    		throw new Exception("Department null");
+    	}else {
+    		employee.setDepartment(employee.getDepartment());
+    	}
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         return employeeRepository.save(employee);
+    	}else {
+    		throw new Exception();
+    	}
     }
 
     // Retrieve all employees
@@ -44,7 +59,6 @@ public class EmployeeService {
             employee.setPhone(updatedEmployee.getPhone());
             employee.setVerificationCode(updatedEmployee.getVerificationCode());
             employee.setVerificationCodeExpiresAt(updatedEmployee.getVerificationCodeExpiresAt());
-            employee.setEnabled(updatedEmployee.isEnable());
             employee.setDepartment(updatedEmployee.getDepartment());
             employee.setAdmin(updatedEmployee.getAdmin());
 

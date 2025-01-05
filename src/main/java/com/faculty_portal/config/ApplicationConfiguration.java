@@ -1,5 +1,6 @@
 package com.faculty_portal.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,34 +15,37 @@ import com.faculty_portal.repository.EmployeeRepository;
 
 @Configuration
 public class ApplicationConfiguration {
-	private final EmployeeRepository userRepository;
-    public ApplicationConfiguration(EmployeeRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+	
+	@Autowired
+	private EmployeeRepository userRepository;
 
-    @Bean
-    UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
+//	public ApplicationConfiguration(EmployeeRepository userRepository) {
+//		this.userRepository = userRepository;
+//	}
 
-    @Bean
-    BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	UserDetailsService userDetailsService() {
+		return username -> userRepository.findByEmail(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+	@Bean
+	BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
 
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+	@Bean
+	AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-        return authProvider;
-    }
+		authProvider.setUserDetailsService(userDetailsService());
+		authProvider.setPasswordEncoder(passwordEncoder());
+
+		return authProvider;
+	}
 }

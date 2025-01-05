@@ -18,10 +18,11 @@ import com.faculty_portal.service.AdminService;
 @RestController
 @RequestMapping("/api/admins")
 public class AdminController {
+
 	@Autowired
 	private AdminService adminService;
 
-	@PostMapping
+	@PostMapping("/save")
 	public Admin createAdmin(@RequestBody Admin admin) {
 		return adminService.saveAdmin(admin);
 	}

@@ -38,16 +38,16 @@ public class Employee implements UserDetails {
 	@ManyToOne
 	@JoinColumn(name = "admin_id", nullable = true)
 	private Admin admin;
-	
+
 	public Employee() {
-		
+
 	}
-	
+
 	public Employee(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
+		this.username = username;
+		this.email = email;
+		this.password = password;
+	}
 
 	public Long getId() {
 		return id;
@@ -143,31 +143,32 @@ public class Employee implements UserDetails {
 
 	public void setAdmin(Admin admin) {
 		this.admin = admin;
-	} 
+	}
+
 	@Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of();
+	}
 
-    //TODO: add proper boolean checks
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+	// TODO: add proper boolean checks
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
- 
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+
 }

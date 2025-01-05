@@ -22,44 +22,42 @@ import com.faculty_portal.service.EmployeeService;
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
-  @Autowired
-  private EmployeeService employeeService;
+	@Autowired
+	private EmployeeService employeeService;
 
-  @PostMapping
-  public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
-      return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.saveEmployee(employee));
-  }
-  
-  @GetMapping("/me")
-  public ResponseEntity<Employee> authenticatedUser() {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//      Employee currentUser = (Employee) authentication.getPrincipal();
-//      return ResponseEntity.ok(currentUser);
-      Object principal = authentication.getPrincipal();
-      if (!(principal instanceof Employee)) {
-          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-      }
-      Employee currentUser = (Employee) principal;
-      return ResponseEntity.ok(currentUser);
+	@PostMapping("/save")
+	public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) throws Exception {
+		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.saveEmployee(employee));
+	}
 
-  }
+	@GetMapping("/me")
+	public ResponseEntity<Employee> authenticatedEmployee() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//      Employee currentEmployee = (Employee) authentication.getPrincipal();
+//      return ResponseEntity.ok(currentEmployee);
+		Object principal = authentication.getPrincipal();
+		if (!(principal instanceof Employee)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		}
+		Employee currentEmployee = (Employee) principal;
+		return ResponseEntity.ok(currentEmployee);
+	}
 
-  @GetMapping("/")
-  public ResponseEntity<List<Employee>> allEmployee() {
-      List <Employee> employee = employeeService.allEmployee();
-      return ResponseEntity.ok(employee);
-  }
+	@GetMapping("/")
+	public ResponseEntity<List<Employee>> allEmployee() {
+		List<Employee> employee = employeeService.allEmployee();
+		return ResponseEntity.ok(employee);
+	}
 
-  @PutMapping("/{id}")
-  public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
-	  return ResponseEntity.ok(employeeService.updateEmployee(id, employee));
-  }
+	@PutMapping("/{id}")
+	public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+		return ResponseEntity.ok(employeeService.updateEmployee(id, employee));
+	}
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
-      employeeService.deleteEmployee(id);
-      return ResponseEntity.ok("Employee deleted successfully");
-  }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
+		employeeService.deleteEmployee(id);
+		return ResponseEntity.ok("Employee deleted successfully");
+	}
 
-
-} 
+}
